@@ -3,6 +3,7 @@
 
     python3 tools/prepare-album.py ~/Pictures/wall-photos
     python3 tools/prepare-album.py ~/Pictures/wall-photos --max 1280 --quality 65 --per-frame 2
+    python3 tools/prepare-album.py --check      # only validate site/config.js and list the frames
 
 Needs Pillow (pip install pillow). Reads frames from site/config.js. Your originals are never changed.
 
@@ -54,12 +55,29 @@ def frame_ratios(cfg):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("photos", type=Path, help="folder with your photos (sub-folders allowed)")
+    ap.add_argument("photos", type=Path, nargs="?", help="folder with your photos (sub-folders allowed)")
+    ap.add_argument("--check", action="store_true", help="validate site/config.js, list frames, change nothing")
     ap.add_argument("--max", type=int, default=1280, help="long edge in px (default 1280)")
     ap.add_argument("--quality", type=int, default=65, help="JPEG quality (default 65)")
     ap.add_argument("--per-frame", type=int, default=0,
                     help="stop after this many photos per frame (default: use every photo)")
     a = ap.parse_args()
+    if a.check:
+        cfg = load_config()
+        ratios = frame_ratios(cfg)
+        wp = cfg.get("wallPhoto")
+        if wp and wp.get("src") and not (SITE / wp["src"]).is_file():
+            sys.exit(f"config.js wallPhoto.src is {wp['src']!r}, but site/{wp['src']} doesn't exist")
+        for i, f in enumerate(cfg["frames"]):
+            q = f.get("quad")
+            if q is not None and not (len(q) == 4 and all(len(p) == 2 and all(0 <= v <= 1 for v in p) for p in q)):
+                sys.exit(f"frame {i + 1}: quad must be 4 [x, y] points between 0 and 1 (TL, TR, BR, BL)")
+            print(f"  frame {i + 1:2d} {(f.get('name') or '')[:28]:28s} ratio {ratios[i]:.2f}"
+                  + (" (measured quad)" if q else " (grid layout)"))
+        print(f"config.js OK: {len(ratios)} frames" + (f", wall photo site/{wp['src']}" if wp and wp.get("src") else ", no wall photo"))
+        return
+    if not a.photos:
+        ap.error("give the photos folder (or --check)")
     try:
         from PIL import Image, ImageOps
     except ImportError:

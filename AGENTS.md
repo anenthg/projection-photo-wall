@@ -71,8 +71,8 @@ Edit the JSON in `site/config.js` (strict JSON after `window.WALL_CONFIG =`; fie
 - Number frames left to right, top to bottom; the person will see these numbers when aligning.
 - Set `title` (shown in the browser tab and desktop editor).
 
-**Check:** `python3 -c "import json,re;t=open('site/config.js').read();json.loads(t[t.index('{'):t.rindex('}')+1])"`
-prints nothing (valid JSON).
+**Check:** `python3 tools/prepare-album.py --check` prints "config.js OK" and the frame list (it needs no
+photos and changes nothing).
 
 ## Phase 3: prepare the photos
 
