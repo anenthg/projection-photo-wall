@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mark Frames</title>
+<style>
+  :root{--bg:#121315;--panel:#1b1d20;--ink:#ece9e2;--dim:#9a978f;--line:#2c2f33;--acc:#ffb547;--q:#47d7ff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  h1{font-size:17px;margin:0 12px 0 0}
+  button,label.btn{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:7px 12px;font:inherit;cursor:pointer}
+  button:hover,label.btn:hover{border-color:var(--acc)}
+  main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;padding:16px}
+  @media (max-width:900px){main{grid-template-columns:1fr}}
+  #wrap{position:relative;background:#000;border:1px solid var(--line);border-radius:8px;overflow:hidden;min-height:240px;display:grid;place-items:center}
+  #wrap img{display:block;max-width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+  #ov{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+  #empty{color:var(--dim);padding:40px;text-align:center}
+  aside{display:flex;flex-direction:column;gap:12px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
+  .card h2{font-size:14px;margin:0 0 8px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  ol{margin:0;padding-left:22px}
+  li{margin:4px 0}
+  li input{width:100%;background:#0e0f10;color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:4px 6px;font:inherit}
+  textarea{width:100%;min-height:200px;background:#0e0f10;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px;font:12px/1.4 ui-monospace,Menlo,monospace}
+  .hint{color:var(--dim);font-size:13px;margin:0}
+  #status{color:var(--acc)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Mark frames</h1>
+  <label class="btn">Open wall photo<input type="file" id="file" accept="image/*" hidden></label>
+  <button id="undo">Undo point</button>
+  <button id="clear">Start over</button>
+  <span id="status">Open a straight-on photo of your wall.</span>
+</header>
+<main>
+  <div id="wrap"><div id="empty">Your photo stays on this computer; nothing is uploaded.</div></div>
+  <aside>
+    <div class="card">
+      <h2>How</h2>
+      <p class="hint">For each frame, click the <b>inside corners of the picture opening</b> (mat included if
+      light should land on it) in this order: <b>top-left, top-right, bottom-right, bottom-left</b>. After 4 clicks
+      the next frame starts. Drag any corner to fine-tune. Then copy the result into <code>site/config.js</code>
+      and copy the photo into <code>site/</code> under the name shown.</p>
+    </div>
+    <div class="card"><h2>Frames</h2><ol id="list"></ol></div>
+    <div class="card">
+      <h2>config.js frames</h2>
+      <textarea id="outTxt" readonly spellcheck="false"></textarea>
+      <p><button id="copy">Copy</button></p>
+    </div>
+  </aside>
+</main>
+<script>
+(()=>{
+  const $=s=>document.querySelector(s),NS='http://www.w3.org/2000/svg';
+  let img=null,W=0,H=0,fileName='wall.jpg',frames=[],cur=[],drag=null;
+  const names=[];
+  const wrap=$('#wrap'),list=$('#list'),out=$('#outTxt'),status=$('#status');
+  $('#file').addEventListener('change',e=>{
+    const f=e.target.files[0];if(!f)return;
+    fileName='wall'+((f.name.match(/\.(jpe?g|png|webp)$/i)||['.jpg'])[0].toLowerCase().replace('jpeg','jpg'));
+    const url=URL.createObjectURL(f);img=new Image();
+    img.onload=()=>{W=img.naturalWidth;H=img.naturalHeight;wrap.textContent='';img.draggable=false;wrap.appendChild(img);
+      const sv=document.createElementNS(NS,'svg');sv.id='ov';sv.setAttribute('viewBox','0 0 '+W+' '+H);sv.setAttribute('preserveAspectRatio','none');
+      wrap.appendChild(sv);sv.addEventListener('pointerdown',down);sv.addEventListener('pointermove',move);sv.addEventListener('pointerup',()=>{drag=null;});
+      frames=[];cur=[];draw();};
+    img.src=url;
+  });
+  const pt=e=>{const r=$('#ov').getBoundingClientRect();return [Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))];};
+  function near(p){
+    const all=[...frames.map((q,i)=>q.map((c,k)=>({q,k,c}))).flat(),...cur.map((c,k)=>({q:cur,k,c}))];
+    const r=$('#ov').getBoundingClientRect(),tol=12;
+    return all.find(o=>Math.hypot((o.c[0]-p[0])*r.width,(o.c[1]-p[1])*r.height)<tol)||null;
+  }
+  function down(e){
+    const p=pt(e),hit=near(p);
+    if(hit){drag=hit;e.target.setPointerCapture&&e.target.setPointerCapture(e.pointerId);return;}
+    cur.push(p);if(cur.length===4){frames.push(cur);cur=[];}
+    draw();
+  }
+  function move(e){if(!drag)return;drag.q[drag.k]=pt(e);draw();}
+  $('#undo').addEventListener('click',()=>{if(cur.length)cur.pop();else if(frames.length){cur=frames.pop();cur.pop();}draw();});
+  $('#clear').addEventListener('click',()=>{frames=[];cur=[];draw();});
+  $('#copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(out.value);status.textContent='Copied.';}catch(e){out.select();status.textContent='Press Cmd/Ctrl+C to copy.';}});
+  const r4=v=>Math.round(v*1e4)/1e4;
+  function draw(){
+    const sv=$('#ov');
+    if(sv){sv.textContent='';
+      const sw=Math.max(W,H)/400;
+      [...frames,cur].forEach((q,i)=>{
+        if(!q.length)return;const done=q.length===4;
+        const pl=document.createElementNS(NS,done?'polygon':'polyline');
+        pl.setAttribute('points',q.map(c=>c[0]*W+','+c[1]*H).join(' '));
+        pl.setAttribute('fill',done?'rgba(71,215,255,.18)':'none');pl.setAttribute('stroke',done?'#47d7ff':'#ffb547');pl.setAttribute('stroke-width',sw*1.5);
+        sv.appendChild(pl);
+        q.forEach(c=>{const ci=document.createElementNS(NS,'circle');ci.setAttribute('cx',c[0]*W);ci.setAttribute('cy',c[1]*H);ci.setAttribute('r',sw*3.5);ci.setAttribute('fill','#ffb547');sv.appendChild(ci);});
+        if(done){const t=document.createElementNS(NS,'text');t.setAttribute('x',q.reduce((a,c)=>a+c[0],0)/4*W);t.setAttribute('y',q.reduce((a,c)=>a+c[1],0)/4*H);
+          t.setAttribute('fill','#fff');t.setAttribute('font-size',sw*14);t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','middle');t.textContent=i+1;sv.appendChild(t);}
+      });
+    }
+    const corner=['top-left','top-right','bottom-right','bottom-left'][cur.length];
+    if(img)status.textContent='Frame '+(frames.length+1)+': click its '+corner+' corner.';
+    list.textContent='';
+    frames.forEach((q,i)=>{const li=document.createElement('li'),inp=document.createElement('input');inp.value=names[i]||('Frame '+(i+1));
+      inp.addEventListener('input',()=>{names[i]=inp.value;emit();});li.appendChild(inp);list.appendChild(li);});
+    emit();
+  }
+  function emit(){
+    const cfg={wallPhoto:img?{src:fileName,width:W,height:H}:null,
+      frames:frames.map((q,i)=>({name:names[i]||('Frame '+(i+1)),quad:q.map(c=>[r4(c[0]),r4(c[1])])}))};
+    out.value='"wallPhoto": '+JSON.stringify(cfg.wallPhoto)+',\n"frames": [\n'+cfg.frames.map(f=>'  '+JSON.stringify(f)).join(',\n')+'\n]'
+      +(img?'\n\n(save the photo as site/'+fileName+')':'');
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

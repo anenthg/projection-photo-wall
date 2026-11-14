@@ -1,0 +1,13 @@
+# Personal: photos, the wall photo, the secret site path
+site/album/*
+!site/album/.gitkeep
+site/album.js
+site/wall.*
+.cloudflare-site
+# Generated / local
+build/
+.wrangler/
+tools/node_modules/
+.venv/
+.DS_Store
+__pycache__/
