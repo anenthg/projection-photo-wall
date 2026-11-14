@@ -14,6 +14,9 @@ at every step.
 - Picture frames on a wall, glass removed (any number, any mix of sizes).
 - An Android projector (or a projector plus an Android TV box / Fire TV stick) that can sit 1 to 2 m from the
   wall. Tested on a 720p/1080p portable Android 13 projector; see [docs/hardware.md](docs/hardware.md).
+- **On an Android projector, use [Fully Kiosk Browser](https://www.fully-kiosk.com/)** to run the wall. It is
+  what this project was built and tested with: full-screen, keeps the screen on, starts on boot, passes the
+  remote's keys to the page and allows the music to autoplay. Setup: [docs/projector-kiosk.md](docs/projector-kiosk.md).
 - Your photos, a computer with Python 3 (and Node 18+ for publishing).
 - Optional: a free Cloudflare account for hosting ([docs/hosting.md](docs/hosting.md) has a local-only option).
 

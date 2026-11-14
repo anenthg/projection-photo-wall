@@ -1,5 +1,10 @@
 # Projector: Fully Kiosk Browser
 
+> **Recommended on any Android projector (or Android TV box): [Fully Kiosk Browser](https://www.fully-kiosk.com/).**
+> The wall was built and tested with it. Other browsers can show the page, but they don't reliably stay
+> full-screen, keep the screen awake, restart on boot, pass every remote key to the page or allow the show
+> music to autoplay.
+
 Fully Kiosk Browser shows one web page full-screen, keeps the screen on, restarts after power cuts and passes
 the TV remote's keys to the page. Install it from the projector's app store, or download the APK from
 fully-kiosk.com on the device. Some features need the paid PLUS licence (a greyed-out setting tells you), and menu names differ between

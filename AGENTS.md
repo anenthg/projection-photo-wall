@@ -35,7 +35,8 @@ Ask (one message):
 3. How many frames, and for each roughly its shape (portrait/landscape/square, or the print size like 8x10).
    Not needed if you get the wall photo.
 4. The projector or player: brand/model and Android version. It must run Android (projector, TV box, Fire TV
-   stick) so it can run Fully Kiosk Browser. See `docs/hardware.md` if they don't have one yet.
+   stick). **On Android, recommend Fully Kiosk Browser** (the tested kiosk app; don't substitute another
+   browser or kiosk app unless the person insists). See `docs/hardware.md` if they don't have a device yet.
 5. Hosting consent: "The page and photos will be on a public but unlisted website (Cloudflare Pages, free),
    under a long random URL that is never linked or indexed. Anyone with the full URL could see the photos. OK?"
    If not OK, use the local-network option in `docs/hosting.md` instead.
@@ -123,6 +124,7 @@ Other hosts or local-only: `docs/hosting.md`.
 
 ## Phase 6: the projector
 
+Recommended app on an Android projector: **Fully Kiosk Browser** (fully-kiosk.com, also on Google Play).
 Walk the person through `docs/projector-kiosk.md` (install Fully Kiosk Browser, start URL = short link, the
 settings list). The person does the clicking on the device; you explain one step at a time. Key settings:
 start URL, **Autoplay videos ON** (allows sound), keep screen on, start on boot, hardware acceleration on.

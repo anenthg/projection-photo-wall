@@ -2,7 +2,8 @@
 
 ## Projector
 
-- **Android is the easy path.** The page runs in Fully Kiosk Browser, an Android app. A projector with Android
+- **Android is the easy path.** The page runs in Fully Kiosk Browser, an Android app, which is the
+  recommended way to run the wall on an Android projector (docs/projector-kiosk.md). A projector with Android
   built in, or any projector plus an Android TV box / Fire TV stick on HDMI, works. iOS/Apple TV can't run it.
 - **Brightness:** in a dimmed room 200 to 500 ANSI lumens is plenty: only the frame openings are lit.
 - **Resolution:** many budget "1080p" Android projectors render apps at 1280x720 and upscale. That's fine: a
