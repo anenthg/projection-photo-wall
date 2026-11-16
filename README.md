@@ -39,12 +39,12 @@ music whenever you pick one from the remote.
 | 1 | Hang the frames and take the glass out (glass reflects the light) | you |
 | 2 | Put your photos in a folder and take a straight-on phone photo of the wall | you |
 | 3 | Prepare the photos and describe the frames | the agent |
-| 4 | Publish the private link | the agent (you log in to the free Cloudflare account once) |
+| 4 | Create a free Cloudflare account, then publish the private link | you create the account ([how](#cloudflare-account-required)); the agent publishes |
 | 5 | Install Fully Kiosk Browser on the projector and type in the short link | you, guided by the agent |
 | 6 | Point the projector at the wall, focus it, then **never move it again** | you |
 | 7 | Fit each frame with the remote's arrow keys (a minute or two per frame) | you |
 
-No agent? Steps 3 and 4 are four commands (see [Quick start](#quick-start)); anyone comfortable with a
+No agent? After creating the Cloudflare account, steps 3 and 4 are four commands (see [Quick start](#quick-start)); anyone comfortable with a
 terminal can run them for you. To change the photos later, only steps 3 and 4 are repeated.
 
 ## What you need
@@ -56,7 +56,8 @@ terminal can run them for you. To change the photos later, only steps 3 and 4 ar
   what this project was built and tested with: full-screen, keeps the screen on, starts on boot, passes the
   remote's keys to the page and allows the music to autoplay. Setup: [docs/projector-kiosk.md](docs/projector-kiosk.md).
 - Your photos, a computer with Python 3 (and Node 18+ for publishing).
-- Optional: a free Cloudflare account for hosting ([docs/hosting.md](docs/hosting.md) has a local-only option).
+- **A free Cloudflare account (required).** The wall is published on Cloudflare Pages, which gives it the web
+  address the projector opens. No domain and no payment card needed; see [below](#cloudflare-account-required).
 
 ## Quick start
 
@@ -73,6 +74,48 @@ python3 tools/prepare-album.py ~/Pictures/wall-photos
 
 Then align each frame with the remote: any arrow opens the menu, **Align frames**
 ([docs/alignment.md](docs/alignment.md)).
+
+## Cloudflare account (required)
+
+Every wall is published to Cloudflare Pages. That is what gives you a web address the projector (or a laptop)
+can open from anywhere. It is free, and you don't need a domain name or a payment card.
+
+### 1. Create the account (about 3 minutes)
+
+1. Go to **[dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)**, enter your email and a
+   password, and select **Sign up**.
+2. Open the email from Cloudflare and click the **verification link**. Do this before publishing: Cloudflare
+   can refuse to publish from an account whose email isn't verified.
+3. If the dashboard asks you to add a website or domain, or to choose a plan, skip it. The wall uses a free
+   `something.pages.dev` address, so no domain and no paid plan are needed.
+
+### 2. Let the publish tool use your account (once)
+
+The first time `./deploy-cloudflare.sh` runs (you or your agent), a browser tab opens on Cloudflare asking
+whether **Wrangler** (Cloudflare's own publishing tool) may make changes to your account. Make sure you're
+signed in to the account you just created, then select **Allow**. Close the tab and return to the terminal; it
+carries on by itself. If you have more than one Cloudflare account, the terminal asks which one to use.
+
+### 3. What to enable in the dashboard
+
+**Nothing needs switching on.** The script creates the Pages project and publishes it as the *production*
+site, and a production `*.pages.dev` address is public by default. To check, open
+[dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → your `photowall-…` project:
+
+| Where | What you should see |
+|---|---|
+| **Deployments** | the newest deployment marked **Production**, branch `main` |
+| **Settings → General → Access policy** | **off** (it only affects preview copies, but leave it off) |
+| **Zero Trust → Access → Applications** | no application covering your `photowall-….pages.dev` address. One would put a login screen in front of the wall, and the projector can't get past it |
+| **Custom domains** | nothing needed; the `pages.dev` address is enough |
+
+### 4. Check the address is public
+
+The script ends by printing a **short link**, such as `photowall-1a2b3c.pages.dev/k7qx9m`. Open it on a phone
+using **mobile data** (Wi-Fi off) in a private browser tab. You should see the wall, with no login screen. A
+brand-new address can take a few minutes to start working; if you get "site can't be reached", wait five
+minutes and try again. Only the short link and the wall address work: the bare `photowall-….pages.dev`
+address shows "Not found" on purpose. More help: [docs/hosting.md](docs/hosting.md#troubleshooting).
 
 ## On the wall
 
@@ -106,7 +149,7 @@ OK or Back stops a show. Photos change one frame at a time, each frame once a mi
 
 Photos stay out of git. When published, they sit on a public-but-unlisted site: a long random path, no index,
 no search engines, no referrer. That is obscurity, not access control; anyone with the full URL can see them.
-`docs/hosting.md` explains the trade-off and a local-network alternative where nothing leaves your home.
+Keep the wall's address to your household, and see `docs/hosting.md` for the details.
 
 ## License
 

@@ -11,8 +11,8 @@ on-demand light shows with music from the remote's menu.
 
 ## Ground rules
 
-- **Privacy first.** The photos are personal. Never upload them anywhere except the hosting target the person
-  approves in Phase 0, never commit them (`site/album/` and `site/album.js` are git-ignored), and never paste
+- **Privacy first.** The photos are personal. Never upload them anywhere except the person's own Cloudflare Pages
+  project (Phase 5), never commit them (`site/album/` and `site/album.js` are git-ignored), and never paste
   their URLs into public places. `.cloudflare-site` holds the secret URL path: never commit, print in public
   logs, or share it.
 - **One source of truth:** `site/index.html` is the whole app. Configure it through `site/config.js` (frames)
@@ -37,11 +37,15 @@ Ask (one message):
 4. The projector or player: brand/model and Android version. It must run Android (projector, TV box, Fire TV
    stick). **On Android, recommend Fully Kiosk Browser** (the tested kiosk app; don't substitute another
    browser or kiosk app unless the person insists). See `docs/hardware.md` if they don't have a device yet.
-5. Hosting consent: "The page and photos will be on a public but unlisted website (Cloudflare Pages, free),
-   under a long random URL that is never linked or indexed. Anyone with the full URL could see the photos. OK?"
-   If not OK, use the local-network option in `docs/hosting.md` instead.
+5. Cloudflare (required, there is no other hosting option): "The page and photos will be on a public but
+   unlisted website (Cloudflare Pages, free), under a long random URL that is never linked or indexed. Anyone
+   with the full URL could see the photos. OK?" If yes, ask them to create a free Cloudflare account and verify
+   its email, following the README section **Cloudflare account (required)**; creating the account and
+   logging in are the person's job, never yours. If they won't use Cloudflare, stop: this setup doesn't
+   support other hosting.
 
-**Check:** you have photos, a frame list (or wall photo), an Android device, and an explicit hosting answer.
+**Check:** you have photos, a frame list (or wall photo), an Android device, an explicit yes to Cloudflare
+hosting, and the person confirms their Cloudflare account exists and its email is verified.
 
 ## Phase 1: tools
 
@@ -108,19 +112,23 @@ menu works, no errors in the browser console. Fix `config.js` corners now if the
 
 ## Phase 5: publish
 
-Cloudflare Pages (default, free; needs a Cloudflare account, the person logs in once in the browser):
+Cloudflare Pages (required; the account from Phase 0):
 
 ```bash
 ./deploy-cloudflare.sh
 ```
 
 The first run creates `.cloudflare-site` (project name, secret path, short code) and opens `wrangler login` if
-needed; logging in is the person's job. It prints three URLs: give the person the **short link** (typed on the
+needed: tell the person a Cloudflare tab will ask whether Wrangler may make changes to their account, and that
+they select **Allow** while signed in to the right account. Logging in is the person's job. It prints three URLs: give the person the **short link** (typed on the
 projector) and the **desktop editor** URL. Re-run it after any change; the URLs never change.
 
-Other hosts or local-only: `docs/hosting.md`.
+Nothing has to be enabled in the Cloudflare dashboard: the script publishes to the production branch, and a
+production `*.pages.dev` address is public by default. Make sure the person hasn't put Cloudflare Access (Zero
+Trust) in front of it, or the projector will hit a login screen. Problems: `docs/hosting.md#troubleshooting`.
 
-**Check:** the short link opens the wall in a desktop browser (photos load, no 404).
+**Check:** the short link opens the wall with no login screen from a phone on mobile data (Wi-Fi off), in a
+private tab: photos load, no 404. A brand-new address can take a few minutes to start resolving.
 
 ## Phase 6: the projector
 
