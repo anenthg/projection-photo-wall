@@ -1,10 +1,8 @@
 # Projection Photo Wall
 
-<p align="center">
-  <a href="docs/media/explainer.mp4"><img src="docs/media/explainer-preview.gif" width="300" alt="Paper-cut explainer: empty frames on a wall, photos on a phone, a projector, fitting each frame with a TV remote, a glowing kolam and a light show"></a>
-  <br>
-  <a href="docs/media/explainer.mp4"><b>▶ Watch the 90-second explainer, with sound</b></a>
-</p>
+https://github.com/user-attachments/assets/a0a651e8-bec8-4e14-90d1-9d56c1ecf929
+
+<p align="center"><sub>The 90-second explainer (turn the sound on). Full quality: <a href="docs/media/explainer.mp4">docs/media/explainer.mp4</a></sub></p>
 
 Turn a wall of empty picture frames into a living photo wall: a small projector warps a separate photo stream
 into each frame, changes one frame at a time with a slow zoom, draws a glowing Kolam line across the wall
