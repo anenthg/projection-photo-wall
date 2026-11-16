@@ -5,9 +5,43 @@ into each frame, changes one frame at a time with a slow zoom, draws a glowing K
 between photos, and on demand plays one-minute sound-and-light shows with original music. Everything runs in
 one web page, aligned with a TV remote, on an Android projector in a kiosk browser.
 
-**With an AI coding agent:** point it at this repo and say *"Set up my photo wall following AGENTS.md"*. The
-playbook walks it (and you) through photos, frame layout, publishing, the projector and alignment, with a check
-at every step.
+**No coding needed.** If you have an AI coding agent (Claude Code or similar), point it at this repo and say
+*"Set up my photo wall following AGENTS.md"*. It does the computer part and tells you, one step at a time, what
+to do on the wall and the projector.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A["📷 <b>Your photos</b><br/>plus one phone photo<br/>of the empty frames"]
+    B["💻 <b>Your computer</b><br/>the agent shrinks photos,<br/>removes location data,<br/>picks a frame for each"]
+    C["🌐 <b>A private web link</b><br/>free hosting, long secret<br/>address, not searchable"]
+    D["📽️ <b>The projector</b><br/>Fully Kiosk Browser opens<br/>the link full-screen"]
+    E["🖼️ <b>Your wall</b><br/>every frame shows<br/>its own photos"]
+    R["🎮 <b>TV remote</b><br/>fit each frame once,<br/>then play light shows"]
+    A --> B --> C --> D --> E
+    R -.-> D
+```
+
+In plain words: your photos are prepared on your computer and put on a private web page. The projector opens
+that page and shines one photo into each empty frame. You use the remote once to nudge each picture so it fits
+its frame exactly; after that the wall runs by itself, changing photos every minute, and plays a light show with
+music whenever you pick one from the remote.
+
+## Setting it up, step by step
+
+| # | Step | Who does it |
+|---|---|---|
+| 1 | Hang the frames and take the glass out (glass reflects the light) | you |
+| 2 | Put your photos in a folder and take a straight-on phone photo of the wall | you |
+| 3 | Prepare the photos and describe the frames | the agent |
+| 4 | Publish the private link | the agent (you log in to the free Cloudflare account once) |
+| 5 | Install Fully Kiosk Browser on the projector and type in the short link | you, guided by the agent |
+| 6 | Point the projector at the wall, focus it, then **never move it again** | you |
+| 7 | Fit each frame with the remote's arrow keys (a minute or two per frame) | you |
+
+No agent? Steps 3 and 4 are four commands (see [Quick start](#quick-start)); anyone comfortable with a
+terminal can run them for you. To change the photos later, only steps 3 and 4 are repeated.
 
 ## What you need
 
